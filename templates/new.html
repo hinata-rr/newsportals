@@ -1,0 +1,27 @@
+{% extends 'flatpages/default.html' %}
+
+{%load censor_filter %}
+
+{% block title %}
+New
+{% endblock title %}
+
+{% block content %}
+<h1 style="text-align: left;">{{ new.title|censor }}</h1>
+<p style="text-align: left;">{{new.created_at|date:"d.m.Y"}}</p>
+<hr>
+<p style="text-align: left;">{{ new.content|censor }}</p>
+<p style="text-align: left;">Автор: {{new.author.name}}<br>
+    Рейтинг статьи: {{new.rating}}<br>
+    Комментарии ({{ new.comment_set.count }}):
+</p>
+{% for comment in new.comment_set.all %}
+<p style="text-align: left;"><strong>{{ comment.user.username }}</strong>
+    ({{ comment.created_at|date:"d.m.Y H:i" }})<br>
+    {{ comment.content|censor }}<br>
+    Рейтинг: {{ comment.rating }}
+</p>
+{% empty %}
+    <p>Комментариев пока нет</p>
+{% endfor %}
+{% endblock content %}
