@@ -1,10 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'flatpages/default.html' %}
+
+{% load custom_tags %}
+
+{% load tz %}
+
+{% load censor_filter %}
+
+{% block title %}
+Статьи
+{% endblock title %}
+
+{% block content %}
+    <h1>Статьи</h1>
+    <h3>{% current_time '%b.%d.%Y' %}</h3>
+
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'news_search' %}" class="btn btn-info">Расширенный поиск</a>
+        <a href="{% url 'article_create' %}" class="btn btn-success">Добавить статью</a>
+        <a href="{% url 'news_list' %}" class="btn btn-primary">Перейти к новостям</a>
+    </div>
+
+    <form method="GET">
+        {{ filterset.form.as_p }}
+        <button type="submit" class="btn btn-primary">Найти</button>
+        <a href="?" class="btn btn-secondary">Сбросить</a>
+    </form>
+
+    <hr>
+
+    Количество статей: {{ articles|length }}
+
+    {% if articles %}
+        <table border="1">
+            <tr>
+                <th>Заголовок</th>
+                <th>Автор</th>
+                <th>Категория</th>
+                <th>Дата публикации</th>
+                <th>Содержание</th>
+                <th>Рейтинг</th>
+                <th>Действия</th>
+            </tr>
+            {% for article in articles %}
+            <tr>
+                <td><a href="{% url 'post_detail' article.id %}">{{ article.title|censor }}</a></td>
+                <td>{{ article.author.name }}</td>
+                <td>
+                    {% for category in article.categories.all %}
+                        {{ category.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Без категории
+                    {% endfor %}
+                </td>
+                <td>{{ article.created_at|date:"d.m.Y" }}</td>
+                <td>{{ article.content|truncatewords:20|censor }}</td>
+                <td>{{ article.rating }}</td>
+                <td>
+                    <a href="{% url 'article_update' article.id %}">Редактировать</a>
+                    <a href="{% url 'article_delete' article.id %}">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>Статей нет!</h2>
+    {% endif %}
+
+    {% if page_obj.has_previous %}
+        <a href="?{% url_replace page=1 %}">1</a>
+        {% if page_obj.previous_page_number != 1 %}
+            ...
+            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+    {% endif %}
+
+    {{ page_obj.number }}
+
+    {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+{% endblock content %}

@@ -1,10 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'flatpages/default.html' %}
+
+{%load censor_filter %}
+
+{% block title %}
+{{ post.title|censor }}
+{% endblock title %}
+
+{% block content %}
+<h1 style="text-align: left;">{{ post.title|censor }}</h1>
+<p style="text-align: left;">
+    <strong>Тип:</strong> {{ post.get_post_type_display }} |
+    <strong>Дата:</strong> {{ post.created_at|date:"d.m.Y H:i" }}
+</p>
+<hr>
+<p style="text-align: left;">{{ post.content|censor }}</p>
+<p style="text-align: left;">
+    <strong>Автор:</strong> {{ post.author.name }}<br>
+    <strong>Рейтинг:</strong> {{ post.rating }}<br>
+    <strong>Комментарии ({{ post.comment_set.count }}):</strong>
+</p>
+
+{% for comment in post.comment_set.all %}
+<div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+    <p style="text-align: left;">
+        <strong>{{ comment.user.username }}</strong>
+        ({{ comment.created_at|date:"d.m.Y H:i" }})<br>
+        {{ comment.content|censor }}<br>
+        Рейтинг: {{ comment.rating }}
+    </p>
+</div>
+{% empty %}
+    <p>Комментариев пока нет</p>
+{% endfor %}
+
+<div style="margin-top: 20px;">
+    {% if post.post_type == 'NW' %}
+        <a href="{% url 'news_update' post.id %}" class="btn btn-warning">Редактировать новость</a>
+        <a href="{% url 'news_delete' post.id %}" class="btn btn-danger">Удалить новость</a>
+        <a href="{% url 'news_list' %}" class="btn btn-primary">Назад к новостям</a>
+    {% else %}
+        <a href="{% url 'article_update' post.id %}" class="btn btn-warning">Редактировать статью</a>
+        <a href="{% url 'article_delete' post.id %}" class="btn btn-danger">Удалить статью</a>
+        <a href="{% url 'articles_list' %}" class="btn btn-primary">Назад к статьям</a>
+    {% endif %}
+</div>
+{% endblock content %}
