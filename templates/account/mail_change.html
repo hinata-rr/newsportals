@@ -1,0 +1,27 @@
+{% extends "account/base.html" %}
+
+{% block content %}
+<h2>Смена email адреса</h2>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label>Текущий email:</label>
+        <input type="email" value="{{ user.email }}" disabled>
+    </div>
+    
+    <div class="form-group">
+        <label>Новый email:</label>
+        {{ form.email }}
+    </div>
+    
+    <div class="form-group">
+        <label>Подтвердите пароль:</label>
+        {{ form.password }}
+    </div>
+    
+    <button type="submit">Сменить email</button>
+    <a href="{% url 'account_email' %}" style="margin-left: 10px;">Отмена</a>
+</form>
+{% endblock %}

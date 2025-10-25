@@ -1,0 +1,56 @@
+{% extends "account/base.html" %}
+
+{% block content %}
+<h2>Email адреса</h2>
+
+{% if user.emailaddress_set.all %}
+<p>Связанные email адреса:</p>
+
+<form action="{% url 'account_email' %}" method="post">
+{% csrf_token %}
+
+{% for emailaddress in user.emailaddress_set.all %}
+<div>
+    <label for="email_radio_{{forloop.counter}}">
+        <input id="email_radio_{{forloop.counter}}" type="radio" name="email" value="{{emailaddress.email}}" {% if emailaddress.primary %}checked="checked"{% endif %}>
+        {{ emailaddress.email }}
+        {% if emailaddress.verified %}
+            <span style="color: green;">(подтвержден)</span>
+        {% else %}
+            <span style="color: red;">(не подтвержден)</span>
+        {% endif %}
+        {% if emailaddress.primary %}
+            <span style="color: blue;">(основной)</span>
+        {% endif %}
+    </label>
+</div>
+{% endfor %}
+
+<div style="margin-top: 20px;">
+    <button type="submit" name="action_primary">Сделать основным</button>
+    <button type="submit" name="action_send">Отправить подтверждение</button>
+    <button type="submit" name="action_remove">Удалить</button>
+</div>
+
+</form>
+
+{% else %}
+<p>У вас нет добавленных email адресов.</p>
+{% endif %}
+
+<h3>Добавить email адрес</h3>
+
+<form method="post" action="{% url 'account_email' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="action_add">Добавить email</button>
+</form>
+
+<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+    <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        <button type="submit" style="background: #dc3545;">Выйти из аккаунта</button>
+    </form>
+</div>
+
+{% endblock %}

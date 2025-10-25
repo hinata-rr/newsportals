@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ошибка входа</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        .error { color: #dc3545; background: #f8d7da; padding: 15px; border-radius: 5px; }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Ошибка входа</h2>
+
+    <div class="error">
+        <p>Произошла ошибка при входе через социальную сеть.</p>
+        {% if error.message %}
+        <p><strong>Причина:</strong> {{ error.message }}</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="/accounts/login/" class="btn">Попробовать снова</a>
+        <a href="/news/" class="btn">На главную</a>
+    </div>
+</body>
+</html>

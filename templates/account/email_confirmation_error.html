@@ -1,0 +1,12 @@
+{% extends "account/base.html" %}
+
+{% block content %}
+<h2>Ошибка подтверждения</h2>
+
+<p>Ссылка для подтверждения email недействительна или устарела.</p>
+
+<div class="links">
+    <a href="{% url 'account_email' %}">Управление email адресами</a> | 
+    <a href="/news/">На главную</a>
+</div>
+{% endblock %}

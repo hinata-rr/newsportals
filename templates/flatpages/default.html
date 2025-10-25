@@ -24,7 +24,13 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/news/">Новости и статьи</a>
+                            <a href="{% url 'account_login' %}" class="nav-link">Войти в аккаунт</a>
+                        </li>
+                        <li class="nav-item">
+                             <a href="{% url 'account_signup' %}" class="nav-link">Зарегистрироваться</a>
+                        </li>
+                        <li class="nav-item">
+                             <a href="{% url 'account_logout' %}" class="nav-link">Выйти с аккаунта</a>
                         </li>
                     </ul>
                 </div>

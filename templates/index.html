@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Portal - Главная</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .container { text-align: center; }
+        .btn { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            margin: 10px; 
+            text-decoration: none; 
+            color: white; 
+            border-radius: 5px;
+        }
+        .btn-primary { background: #007bff; }
+        .btn-success { background: #28a745; }
+        .btn-info { background: #17a2b8; }
+        .btn-warning { background: #ffc107; color: black; }
+        .user-info { background: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать в News Portal!</h1>
+        
+        {% if user.is_authenticated %}
+            <div class="user-info">
+                <h3>Привет, {{ user.username }}!</h3>
+                <p>Email: {{ user.email }}</p>
+                
+                {% if user.groups.all %}
+                    <p>Группы: 
+                        {% for group in user.groups.all %}
+                            <strong>{{ group.name }}</strong>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                
+                {% if perms.news.add_post %}
+                    <p style="color: green;">✅ Вы автор и можете создавать посты</p>
+                {% else %}
+                    <p style="color: orange;">ℹ️ Вы можете стать автором для создания постов</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>Войдите в систему чтобы получить доступ ко всем возможностям</p>
+        {% endif %}
+
+        <div style="margin: 30px 0;">
+            <a href="/news/" class="btn btn-primary">📰 Читать новости</a>
+            <a href="/news/articles/" class="btn btn-success">📖 Читать статьи</a>
+            
+            {% if user.is_authenticated %}
+                {% if perms.news.add_post %}
+                    <a href="/news/create/" class="btn btn-warning">✏️ Создать новость</a>
+                    <a href="/articles/create/" class="btn btn-warning">📝 Создать статью</a>
+                {% else %}
+                    <a href="/news/upgrade/" class="btn btn-info">⭐ Стать автором</a>
+                {% endif %}
+                <a href="/accounts/email/" class="btn btn-info">📧 Управление email</a>
+                <a href="/accounts/logout/" class="btn" style="background: #dc3545;">🚪 Выйти</a>
+            {% else %}
+                <a href="/accounts/login/" class="btn btn-primary">🔐 Войти</a>
+                <a href="/accounts/signup/" class="btn btn-success">📝 Зарегистрироваться</a>
+            {% endif %}
+        </div>
+
+        <!-- Быстрый вход через социальные сети -->
+        {% if not user.is_authenticated %}
+        <div style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+            <h3>Быстрый вход через:</h3>
+            <a href="/accounts/google/login/" class="btn" style="background: #4285F4;">Google</a>
+            <a href="/accounts/yandex/login/" class="btn" style="background: #FF0000;">Yandex</a>
+        </div>
+        {% endif %}
+
+        <!-- Информация о сайте -->
+        <div style="margin-top: 40px; font-size: 14px; color: #666;">
+            <p>News Portal - платформа для публикации новостей и статей</p>
+            <p>✅ Чтение постов без регистрации</p>
+            <p>✅ Создание и редактирование для авторов</p>
+            <p>✅ Регистрация через email или социальные сети</p>
+        </div>
+    </div>
+</body>
+</html>

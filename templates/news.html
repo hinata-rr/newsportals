@@ -16,9 +16,24 @@ News
 
     <div style="margin-bottom: 20px;">
         <a href="{% url 'news_search' %}" class="btn btn-info">Расширенный поиск</a>
-        <a href="{% url 'news_create' %}" class="btn btn-success">Добавить новость</a>
+        {% if perms.news.add_post %}
+            <a href="{% url 'news_create' %}" class="btn btn-success">Добавить новость</a>
+            <a href="{% url 'article_create' %}" class="btn btn-success">Добавить статью</a>
+        {% endif %}
         <a href="{% url 'articles_list' %}" class="btn btn-primary">Перейти к статьям</a>
     </div>
+
+    {% if user.is_authenticated %}
+        {% if not user.groups.all.0.name == 'authors' %}
+            <div style="margin-bottom: 20px;">
+                <a href="/news/upgrade/" class="btn btn-info">Стать автором!</a>
+            </div>
+        {% else %}
+            <div style="margin-bottom: 20px;">
+                <span class="btn btn-success">Вы автор!</span>
+            </div>
+        {% endif %}
+    {% endif %}
 
     <form method="GET">
         {{ filterset.form.as_p }}
@@ -56,8 +71,12 @@ News
                 <td>{{ post.content|truncatewords:20|censor }}</td>
                 <td>{{ post.rating }}</td>
                 <td>
-                    <a href="{% url 'news_update' post.id %}">Редактировать</a>
-                    <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% if perms.news.change_post %}
+                        <a href="{% url 'news_update' post.id %}">Редактировать</a>
+                    {% endif %}
+                    {% if perms.news.delete_post %}
+                        <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
