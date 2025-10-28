@@ -53,8 +53,7 @@
             
             {% if user.is_authenticated %}
                 {% if perms.news.add_post %}
-                    <a href="/news/create/" class="btn btn-warning">✏️ Создать новость</a>
-                    <a href="/articles/create/" class="btn btn-warning">📝 Создать статью</a>
+                    <a href="/news/create/" class="btn btn-warning">✏️ Создать новость или статью</a>
                 {% else %}
                     <a href="/news/upgrade/" class="btn btn-info">⭐ Стать автором</a>
                 {% endif %}

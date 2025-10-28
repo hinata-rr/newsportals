@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
 from .models import Post, Category, Author
+from django.utils import timezone
+from datetime import timedelta
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -61,9 +63,25 @@ class PostForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         content = cleaned_data.get('content')
+        author = cleaned_data.get('author')
+        if author and not self.instance.pk:
+            today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            tomorrow_start = today_start + timedelta(days=1)
+
+            posts_today = Post.objects.filter(
+                author=author,
+                created_at__gte=today_start,
+                created_at__lt=tomorrow_start
+            ).count()
+
+            if posts_today >= 3:
+                raise ValidationError(
+                    f'Нельзя публиковать более 3 постов в сутки. '
+                    f'Автор "{author}" уже опубликовал {posts_today} постов сегодня.'
+                )
         if content is not None and len(content) < 50:
             raise ValidationError({
-                "description": "Описание не может быть менее 50 символов."
+                "content": "Описание не может быть менее 50 символов."
             })
 
         title = cleaned_data.get('title')
@@ -89,6 +107,12 @@ class PostForm(forms.ModelForm):
                 "Содержание должно начинаться с заглавной буквы."
             )
         return content
+
+    def save(self, commit=True):
+        post = super().save(commit=commit)
+        if commit:
+            self.save_m2m()
+        return post
 
 class CommonSignupForm(SignupForm):
     def save(self, request):

@@ -71,13 +71,38 @@ News
                 <td>{{ post.content|truncatewords:20|censor }}</td>
                 <td>{{ post.rating }}</td>
                 <td>
-                    {% if perms.news.change_post %}
-                        <a href="{% url 'news_update' post.id %}">Редактировать</a>
-                    {% endif %}
-                    {% if perms.news.delete_post %}
-                        <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% for category in post.categories.all %}
+                        <span style="display: inline-block; margin: 1px; padding: 2px 5px; background: #e9ecef; border-radius: 3px;">
+                            {{ category.name }}
+                            {% if user.is_authenticated %}
+                                {% if user in category.subscribers.all %}
+                                    <a href="{% url 'unsubscribe_category' category.id %}"
+                                        style="color: #dc3545; text-decoration: none; margin-left: 3px;"
+                                        title="Отписаться">✕</a>
+                                {% else %}
+                                    <a href="{% url 'subscribe_category' category.id %}"
+                                        style="color: #28a745; text-decoration: none; margin-left: 3px;"
+                                        title="Подписаться">+</a>
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    {% empty %}
+                        Без категории
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if post.id %}
+                        {% if perms.news.change_post %}
+                            <a href="{% url 'news_update' post.id %}">Редактировать</a>
+                        {% endif %}
+                        {% if perms.news.delete_post %}
+                            <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                        {% endif %}
+                    {% else %}
+                        <span style="color: #999;">Нет действий</span>
                     {% endif %}
                 </td>
+
             </tr>
             {% endfor %}
         </table>

@@ -71,11 +71,15 @@
                 <td>{{ article.content|truncatewords:20|censor }}</td>
                 <td>{{ article.rating }}</td>
                 <td>
-                    {% if perms.news.change_post %}
-                        <a href="{% url 'news_update' post.id %}">Редактировать</a>
-                    {% endif %}
-                    {% if perms.news.delete_post %}
-                        <a href="{% url 'news_delete' post.id %}">Удалить</a>
+                    {% if post.id %}
+                        {% if perms.news.change_post %}
+                            <a href="{% url 'article_update' post.id %}">Редактировать</a>
+                        {% endif %}
+                        {% if perms.news.delete_post %}
+                            <a href="{% url 'article_delete' post.id %}">Удалить</a>
+                        {% endif %}
+                    {% else %}
+                        <span style="color: #999;">Нет действий</span>
                     {% endif %}
                 </td>
             </tr>
