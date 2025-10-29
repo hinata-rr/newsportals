@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
 from pathlib import Path
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
+# Для работы сайта
 SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'news.apps.NewsConfig',
+    'news.apps.NewsConfig', # Моё приложение
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.yandex',
     'django_apscheduler',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -155,16 +158,34 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_FORMS = {
     'signup': 'news.forms.CommonSignupForm'
 }
-
+# email_backend для проверки работы в консоли
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Настройки smtp Yandex
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'vyazovoiartem'
-EMAIL_HOST_PASSWORD = 'секрет'
+EMAIL_HOST_PASSWORD = 'secret'
 DEFAULT_FROM_EMAIL = 'vyazovoiartem@yandex.ru'
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[News Portal] '
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+# Настройки Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+CELERY_ENABLE_UTC = False
+
+# Периодические задачи (Beat)
+CELERY_BEAT_SCHEDULE = {
+    'send-weekly-digest': {
+        'task': 'news.tasks.send_weekly_digest',
+        'schedule': crontab(hour=8, minute=0, day_of_week=1),
+    },
+}
