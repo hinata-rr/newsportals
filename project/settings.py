@@ -62,6 +62,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -165,7 +168,7 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'vyazovoiartem'
-EMAIL_HOST_PASSWORD = 'secret'
+EMAIL_HOST_PASSWORD = 'hvmrhyokyaoigbpm'
 DEFAULT_FROM_EMAIL = 'vyazovoiartem@yandex.ru'
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[News Portal] '
@@ -188,4 +191,12 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'news.tasks.send_weekly_digest',
         'schedule': crontab(hour=8, minute=0, day_of_week=1),
     },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),
+        'TIMEOUT': 60*3,
+    }
 }
